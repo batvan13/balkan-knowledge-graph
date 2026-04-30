@@ -18,7 +18,7 @@ If a table, column group, or structural idea is not aligned with this document, 
 
 Phase 1 implementation scope is:
 
-- accommodation-first
+- accommodation-first foundation, with food-place and attraction domain expansions approved
 - central entity model
 - multilingual-ready
 - admin-managed
@@ -211,18 +211,151 @@ Examples:
 - accommodation-specific factual fields
 
 ### Notes
-- This is the main type-specific detail table for Phase 1.
+- This is the type-specific detail table for accommodation domain.
 - It must be linked to `entities`.
 - Keep it practical and scoped to real accommodation needs.
 
 ### Forbidden drift
 - putting these fields in `entities`
 - turning this table into a second main object table
-- adding fields for restaurants/attractions/services in Phase 1
+- adding food-place or other domain fields here
 
 ---
 
-## 2.8 `amenities`
+## 2.8 `food_place_details`
+### Role
+Food-place-specific structured data table.
+
+### Purpose
+Lean, food-domain-specific extension for food-related entities.
+1:1 extension of the `entities` record — one row per food-place entity.
+
+### Allowed responsibility
+- service mode flags (reservations, takeaway, delivery)
+- meal period flags (breakfast, lunch, dinner)
+- price range signal
+
+### Approved columns
+- `id`
+- `entity_id` (unique FK to `entities.id`)
+- `accepts_reservations`
+- `takeaway_available`
+- `delivery_available`
+- `serves_breakfast`
+- `serves_lunch`
+- `serves_dinner`
+- `price_range` (nullable string, not DB enum)
+- timestamps
+
+### Approved food-place entity type codes
+These codes are seeded in `entity_types` via `EntityTypeSeeder`:
+- `restaurant`
+- `tavern`
+- `bar`
+- `pub`
+- `cafe`
+- `bistro`
+- `fast_food`
+- `pastry_shop`
+
+### Notes
+- Structured boolean flags only — no free-text fields.
+- `price_range` is a nullable string. Application layer enforces allowed values: `budget`, `midrange`, `premium`, `luxury`.
+- FK is restrictive by default (no cascade delete).
+
+### Forbidden drift
+- adding cuisine columns here
+- adding menu_url, average_bill, seating capacity
+- adding opening hours
+- adding entertainment/live_music/smoking flags
+- adding hotel linkage field
+- turning this into a second `entities` table
+- mixing food-place fields into `accommodation_details` or `entities`
+
+---
+
+## 2.9 `attraction_details`
+### Role
+Attraction-specific structured data table.
+
+### Purpose
+Lean, type-specific extension for attraction entities.
+1:1 extension of the `entities` record — one row per attraction entity.
+
+### Allowed responsibility
+- nature / culture classification flags
+- indoor / outdoor flags
+- entry fee flags
+- estimated visit duration
+- accessibility and audience flags
+- seasonal flag
+
+### Approved columns
+- `id`
+- `entity_id` (unique FK to `entities.id`)
+- `is_natural` (nullable boolean)
+- `is_cultural` (nullable boolean)
+- `is_indoor` (nullable boolean)
+- `is_outdoor` (nullable boolean)
+- `is_free` (nullable boolean)
+- `has_entry_fee` (nullable boolean)
+- `estimated_visit_minutes` (nullable unsigned small integer)
+- `is_family_friendly` (nullable boolean)
+- `is_accessible` (nullable boolean)
+- `is_seasonal` (nullable boolean)
+- timestamps
+
+### Approved attraction entity type codes
+These codes are seeded in `entity_types` via `EntityTypeSeeder`:
+- `museum`
+- `gallery`
+- `monument`
+- `monastery`
+- `church`
+- `chapel`
+- `fortress`
+- `castle`
+- `palace`
+- `tomb`
+- `megalith`
+- `waterfall`
+- `cave`
+- `beach`
+- `park`
+- `reservoir`
+- `spring`
+- `rock_formation`
+- `heritage_tree`
+- `observatory`
+- `planetarium`
+- `zoo`
+
+### Important exclusions
+Old attraction dropdown categories from the legacy system were reviewed and rejected as direct schema truth.
+The following were intentionally NOT adopted:
+- historical period / culture labels (`ancient`, `roman`, `thracian`, `medieval`, `proto_bulgarian`, `revival`)
+- garbage-bucket catch-all types (`other_historical`, `other_cultural`, `other_natural`, `other_modern`)
+- route model types (`eco_trail`, `trail`, `bike_route`, `route`)
+- activity / facility / infrastructure types (`golf_course`, `paintball_field`, `water_park`, `karting_track`, `lift_station`, `airport`, `sports_attraction`)
+- wrong-domain crossovers (`camping`, `hut`, `shelter`)
+
+### Notes
+- Boolean flags are nullable — many attraction attributes are legitimately unknown.
+- FK is restrictive by default (no cascade delete).
+
+### Forbidden drift
+- historical period / culture classification in schema
+- opening hours logic
+- ticket pricing structures
+- legal heritage registry structures
+- booking / reservation logic
+- theme / audience / marketing classification
+- route tables
+- additional attraction-related tables beyond this one
+
+---
+
+## 2.10 `amenities`
 ### Role
 Controlled amenity dictionary.
 
@@ -246,7 +379,7 @@ Canonical machine-readable list of amenities/features.
 
 ---
 
-## 2.9 `amenity_translations`
+## 2.11 `amenity_translations`
 ### Role
 Multilingual amenity label table.
 
@@ -268,7 +401,7 @@ Store translated human-readable labels for amenities.
 
 ---
 
-## 2.10 `entity_amenities`
+## 2.12 `entity_amenities`
 ### Role
 Pivot table between entities and amenities.
 
@@ -289,7 +422,7 @@ Connect catalog objects to their available amenities.
 
 ---
 
-## 2.11 `entity_media`
+## 2.13 `entity_media`
 ### Role
 Unified gallery/media table for entities.
 
@@ -403,9 +536,14 @@ Forbidden:
 ---
 
 ## Principle 4 — detail tables must stay type-specific
-`accommodation_details` must contain only accommodation-specific data.
+Each detail table must contain only data specific to its own domain.
+
+- `accommodation_details` — accommodation domain only
+- `food_place_details` — food-place domain only
+- `attraction_details` — attraction domain only
 
 Do not use detail tables as generic junk drawers.
+Do not mix domain-specific fields across detail tables.
 
 ---
 
@@ -465,7 +603,9 @@ The approved Phase 1 database direction is:
 - one central `entities` table
 - one multilingual translation pattern
 - one places backbone
-- one accommodation detail table
+- one accommodation detail table (`accommodation_details`)
+- one food-place detail table (`food_place_details`)
+- one attraction detail table (`attraction_details`)
 - one unified amenities system
 - one unified media system
 - Laravel users as ownership/auth base

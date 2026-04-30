@@ -6,7 +6,7 @@
 
 Phase 1 е проектирана като:
 
-- accommodation-first старт
+- accommodation-first старт, с одобрени food-place и attraction разширения
 - с универсален централен `entities` модел
 - с отделени translation слоеве
 - с отделени type-specific слоеве
@@ -71,6 +71,8 @@ Lookup таблица за canonical entity type codes.
 - timestamps
 
 Одобрен seed set:
+
+Accommodation types:
 - `hotel`
 - `guesthouse`
 - `apartment`
@@ -80,6 +82,42 @@ Lookup таблица за canonical entity type codes.
 - `bungalow`
 - `camping`
 - `lodge`
+
+Food-place types:
+- `restaurant`
+- `tavern`
+- `bar`
+- `pub`
+- `cafe`
+- `bistro`
+- `fast_food`
+- `pastry_shop`
+
+Attraction types:
+- `museum`
+- `gallery`
+- `monument`
+- `monastery`
+- `church`
+- `chapel`
+- `fortress`
+- `castle`
+- `palace`
+- `tomb`
+- `megalith`
+- `waterfall`
+- `cave`
+- `beach`
+- `park`
+- `reservoir`
+- `spring`
+- `rock_formation`
+- `heritage_tree`
+- `observatory`
+- `planetarium`
+- `zoo`
+
+Бележка: всички codes се съхраняват в един `EntityTypeSeeder`.
 
 ---
 
@@ -263,6 +301,63 @@ Constraint:
 
 ---
 
+### 11. `food_place_details`
+Lean type-specific extension за food-place entities.
+1:1 extension на `entities` record за food домейна.
+
+Одобрени колони:
+- `id`
+- `entity_id`
+- `accepts_reservations`
+- `takeaway_available`
+- `delivery_available`
+- `serves_breakfast`
+- `serves_lunch`
+- `serves_dinner`
+- `price_range`
+- timestamps
+
+Constraint:
+- unique (`entity_id`)
+
+Бележки:
+- boolean флагове с default `false`
+- `price_range` е nullable string — не е DB enum
+- FK поведение: restrictive (без cascade delete)
+- без cuisine, menu_url, opening hours, seating, entertainment полета
+
+---
+
+### 12. `attraction_details`
+Lean type-specific extension за attraction entities.
+1:1 extension на `entities` record за attraction домейна.
+
+Одобрени колони:
+- `id`
+- `entity_id`
+- `is_natural`
+- `is_cultural`
+- `is_indoor`
+- `is_outdoor`
+- `is_free`
+- `has_entry_fee`
+- `estimated_visit_minutes`
+- `is_family_friendly`
+- `is_accessible`
+- `is_seasonal`
+- timestamps
+
+Constraint:
+- unique (`entity_id`)
+
+Бележки:
+- всички boolean флагове са nullable — много attraction атрибути са легитимно неизвестни
+- `estimated_visit_minutes` е nullable unsignedSmallInteger
+- FK поведение: restrictive (без cascade delete)
+- без opening hours, ticket pricing, heritage registry, booking логика
+
+---
+
 ## FK backfill статус
 
 Добавени и одобрени са deferred foreign keys към `entities`:
@@ -284,7 +379,6 @@ Constraint:
 - `entity_sources`
 - contact-specific layer
 - normalized address layer
-- restaurant-specific details
 - attraction-specific details
 - services-specific details
 - moderation/workflow layers
@@ -293,6 +387,24 @@ Constraint:
 - localized slugs
 - belongsToMany convenience relations
 - admin/UI logic
+
+Съзнателно отложено за food-place домейна:
+- cuisine / кухня
+- теми и концепции на заведенията
+- nightlife / entertainment venue expansion
+- opening hours / работно време
+- hotel-food relation layer
+- по-богата feature taxonomy
+
+Съзнателно отложено / отхвърлено за attraction домейна:
+- исторически периоди и култури като schema типове (roman, thracian, medieval, proto_bulgarian, revival)
+- catch-all / garbage-bucket типове (other_historical, other_cultural, other_natural)
+- route model типове (eco_trail, trail, bike_route, route)
+- activity / facility / infrastructure типове (golf_course, water_park, karting_track, airport)
+- opening hours / работно време
+- ticket pricing структури
+- legal heritage registry структури
+- booking / reservation логика
 
 ---
 
@@ -304,6 +416,8 @@ Constraint:
 - достатъчно обща за future expansion
 - без заключване в стария хотелски модел
 - с ясно отделени structural, translation, amenity, media и type-specific слоеве
+- покрива accommodation домейна (9 типа), food-place домейна (8 типа) и attraction домейна (22 типа)
+- type-specific extension pattern е доказан с три имплементирани detail tables
 
 ---
 

@@ -10,6 +10,7 @@ class EntityTypeSeeder extends Seeder
     public function run(): void
     {
         $codes = [
+            // accommodation
             'hotel',
             'guesthouse',
             'apartment',
@@ -19,6 +20,38 @@ class EntityTypeSeeder extends Seeder
             'bungalow',
             'camping',
             'lodge',
+            // food places
+            'restaurant',
+            'tavern',
+            'bar',
+            'pub',
+            'cafe',
+            'bistro',
+            'fast_food',
+            'pastry_shop',
+            // attractions
+            'museum',
+            'gallery',
+            'monument',
+            'monastery',
+            'church',
+            'chapel',
+            'fortress',
+            'castle',
+            'palace',
+            'tomb',
+            'megalith',
+            'waterfall',
+            'cave',
+            'beach',
+            'park',
+            'reservoir',
+            'spring',
+            'rock_formation',
+            'heritage_tree',
+            'observatory',
+            'planetarium',
+            'zoo',
         ];
 
         foreach ($codes as $code) {
