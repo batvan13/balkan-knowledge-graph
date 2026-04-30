@@ -32,4 +32,9 @@ class Entity extends Model
     {
         return $this->hasMany(EntityMedia::class);
     }
+
+    public function contacts(): HasMany
+    {
+        return $this->hasMany(EntityContact::class);
+    }
 }

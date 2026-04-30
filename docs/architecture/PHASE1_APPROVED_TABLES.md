@@ -447,6 +447,134 @@ Store media items related to an object.
 
 ---
 
+## 2.14 `entity_contacts`
+### Role
+Universal contact points table for any entity.
+
+### Purpose
+Store structured contact information per entity, independent of domain.
+
+### Approved fields
+- `id`
+- `entity_id` (FK to `entities.id`)
+- `type`
+- `value`
+- `is_primary`
+- `created_at`
+- `updated_at`
+
+### Approved type values
+- `phone`
+- `mobile`
+- `email`
+- `viber`
+- `whatsapp`
+
+### Notes
+- Universal — not domain-specific.
+- `is_primary` identifies the canonical contact per type.
+- No `sort_order` — not needed at Phase 1.
+- FK is restrictive by default (no cascade delete).
+
+### Forbidden drift
+- contact labels (reception, manager, bookings)
+- verified/moderated flags
+- person or role names
+- time-valid contacts (valid_from / valid_to)
+- locale-specific contact text
+- internal extensions or department codes
+- domain-specific contact tables
+
+---
+
+# 2A. APPROVED NEXT UNIVERSAL PACKAGE
+
+These tables are **approved** as the next Phase 1 implementation package.
+They are **not yet implemented**.
+
+## 2A.1 `entity_links`
+### Role
+Universal external URLs table for any entity.
+
+### Purpose
+Store structured external presence links per entity, independent of domain.
+
+### Approved fields
+- `id`
+- `entity_id` (FK to `entities.id`)
+- `type`
+- `url`
+- `is_primary`
+- `created_at`
+- `updated_at`
+
+### Approved type values
+- `website`
+- `facebook`
+- `instagram`
+- `tiktok`
+- `youtube`
+- `menu`
+- `booking`
+
+### Notes
+- Universal — not domain-specific.
+- `is_primary` identifies the canonical link per type.
+- No `sort_order` — not needed at Phase 1.
+- `map` is excluded — coordinates already exist on `entities` (`lat`/`lng`).
+
+### Forbidden drift
+- SEO metadata fields
+- follower or engagement metrics
+- domain extraction columns
+- platform account IDs
+- click tracking or analytics
+- embed metadata
+- merging with `entity_sources`
+
+---
+
+## 2A.2 `entity_sources`
+### Role
+Universal provenance / source-of-truth layer for any entity.
+
+### Purpose
+Store where entity data came from, supporting methodological honesty about data origin.
+
+### Approved fields
+- `id`
+- `entity_id` (FK to `entities.id`)
+- `source_type`
+- `source_url`
+- `is_official`
+- `first_seen_at`
+- `last_seen_at`
+- `created_at`
+- `updated_at`
+
+### Approved source_type values
+- `official_website`
+- `social_profile`
+- `manual_entry`
+- `third_party_listing`
+
+### Notes
+- Universal — not domain-specific.
+- `is_official` is a lean binary provenance flag.
+- `first_seen_at` / `last_seen_at` are provenance timestamps, not crawl-state metadata.
+- Must NOT be merged with `entity_links`.
+
+### Forbidden drift
+- confidence scores
+- crawl state flags
+- parser version tracking
+- raw payload storage
+- per-field provenance
+- source weighting or priority engine
+- scraper job references
+
+---
+
 # 3. APPROVED LATER TABLES
 
 These are allowed later in Phase 1.5 or later Phase 1 expansion,
@@ -466,27 +594,6 @@ Store price signals in a structured way without pretending they are always autho
 ### Forbidden drift
 - pretending prices are always exact and universally valid
 - embedding all price logic inside entities/details without provenance
-
----
-
-## 3.2 `entity_sources`
-### Role
-Source/provenance tracking table.
-
-### Purpose
-Store where certain data came from:
-- owner-submitted
-- official website
-- manual research
-- other approved source types
-
-### Notes
-- Strongly useful for future dataset evolution
-- Can wait slightly, but should remain planned
-
-### Forbidden drift
-- fake certainty with no source trail
-- untracked imported factual data
 
 ---
 
@@ -600,6 +707,7 @@ No implementation should skip this order.
 
 The approved Phase 1 database direction is:
 
+**Currently implemented:**
 - one central `entities` table
 - one multilingual translation pattern
 - one places backbone
@@ -608,8 +716,12 @@ The approved Phase 1 database direction is:
 - one attraction detail table (`attraction_details`)
 - one unified amenities system
 - one unified media system
+- one universal contact points table (`entity_contacts`)
 - Laravel users as ownership/auth base
-- simple structure now, expandable later
+
+**Approved next (not yet implemented):**
+- one universal external links table (`entity_links`)
+- one universal source provenance table (`entity_sources`)
 
 This is the approved foundation.
 

@@ -358,6 +358,91 @@ Constraint:
 
 ---
 
+### 13. `entity_contacts`
+Универсален слой за контактни точки на всеки entity.
+
+Одобрени колони:
+- `id`
+- `entity_id`
+- `type`
+- `value`
+- `is_primary`
+- timestamps
+
+Одобрени `type` стойности:
+- `phone`
+- `mobile`
+- `email`
+- `viber`
+- `whatsapp`
+
+Бележки:
+- универсална таблица — не е domain-specific
+- без `sort_order`
+- без contact labels, verified flags, person names, time-valid contacts
+- FK поведение: restrictive (без cascade delete)
+
+---
+
+## Одобрен следващ пакет (не е имплементиран още)
+
+Следните таблици са одобрени като следващ Phase 1 пакет.
+Те **не са имплементирани** към момента на този checkpoint.
+
+### Next-1. `entity_links`
+Универсален слой за external URL присъствие на всеки entity.
+
+Одобрени колони:
+- `id`
+- `entity_id`
+- `type`
+- `url`
+- `is_primary`
+- timestamps
+
+Одобрени `type` стойности:
+- `website`
+- `facebook`
+- `instagram`
+- `tiktok`
+- `youtube`
+- `menu`
+- `booking`
+
+Бележки:
+- универсална таблица — не е domain-specific
+- без `sort_order`
+- `map` е изключен — координатите вече са в `entities` (`lat`/`lng`)
+- не се слива с `entity_sources`
+
+---
+
+### Next-2. `entity_sources`
+Универсален provenance / source-of-truth слой за всеки entity.
+
+Одобрени колони:
+- `id`
+- `entity_id`
+- `source_type`
+- `source_url`
+- `is_official`
+- `first_seen_at`
+- `last_seen_at`
+- timestamps
+
+Одобрени `source_type` стойности:
+- `official_website`
+- `social_profile`
+- `manual_entry`
+- `third_party_listing`
+
+Бележки:
+- универсална таблица — не е domain-specific
+- без confidence score, crawl state, parser version, raw payload, per-field provenance
+- не се слива с `entity_links`
+
+---
+
 ## FK backfill статус
 
 Добавени и одобрени са deferred foreign keys към `entities`:
@@ -373,13 +458,10 @@ Constraint:
 
 ## Какво съзнателно НЕ е включено в този checkpoint
 
-Не са включени в тази фаза:
+Не са включени в тази фаза (все още извън scope):
 
 - `entity_price_signals`
-- `entity_sources`
-- contact-specific layer
 - normalized address layer
-- attraction-specific details
 - services-specific details
 - moderation/workflow layers
 - provider/platform-specific media logic
@@ -387,6 +469,10 @@ Constraint:
 - localized slugs
 - belongsToMany convenience relations
 - admin/UI logic
+- relation layer
+- claim/ownership layer
+- events domain
+- facets/classification layer
 
 Съзнателно отложено за food-place домейна:
 - cuisine / кухня
@@ -418,13 +504,19 @@ Constraint:
 - с ясно отделени structural, translation, amenity, media и type-specific слоеве
 - покрива accommodation домейна (9 типа), food-place домейна (8 типа) и attraction домейна (22 типа)
 - type-specific extension pattern е доказан с три имплементирани detail tables
+- универсален contact layer е имплементиран (`entity_contacts`)
 
 ---
 
 ## Следваща посока
 
-След този checkpoint следващите архитектурни решения трябва да продължат по същия модел:
+Одобреният следващ имплементационен пакет е:
+- `entity_links`
+- `entity_sources`
 
+Вижте секция "Одобрен следващ пакет" по-горе за точните колони и одобрени стойности.
+
+След имплементацията на този пакет, следващите архитектурни решения трябва да продължат по същия модел:
 - table-by-table
 - без overengineering
 - без premature abstractions
