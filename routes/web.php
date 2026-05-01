@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\EntityController as AdminEntityController;
+use App\Http\Controllers\Admin\EntityTranslationController as AdminEntityTranslationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/entities/create', [AdminEntityController::class, 'create'])->name('entities.create');
     Route::post('/entities', [AdminEntityController::class, 'store'])->name('entities.store');
     Route::get('/entities/{entity}/edit', [AdminEntityController::class, 'edit'])->name('entities.edit');
+
+    Route::post('/entities/{entity}/translations', [AdminEntityTranslationController::class, 'store'])->name('entities.translations.store');
+    Route::get('/entities/{entity}/translations/{translation}/edit', [AdminEntityTranslationController::class, 'edit'])->name('entities.translations.edit');
+    Route::put('/entities/{entity}/translations/{translation}', [AdminEntityTranslationController::class, 'update'])->name('entities.translations.update');
 });
 
 require __DIR__.'/auth.php';

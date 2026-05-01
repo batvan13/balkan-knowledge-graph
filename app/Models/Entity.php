@@ -23,6 +23,11 @@ class Entity extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function translations(): HasMany
+    {
+        return $this->hasMany(EntityTranslation::class);
+    }
+
     public function entityAmenities(): HasMany
     {
         return $this->hasMany(EntityAmenity::class);

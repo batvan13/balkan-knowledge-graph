@@ -54,7 +54,7 @@ class EntityController extends Controller
 
     public function edit(Entity $entity)
     {
-        $entity->load(['entityType', 'place', 'user']);
+        $entity->load(['entityType', 'place', 'user', 'translations']);
 
         return view('admin.entities.edit', compact('entity'));
     }
