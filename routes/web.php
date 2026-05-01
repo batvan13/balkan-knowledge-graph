@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\EntityPageController;
 use App\Http\Controllers\Admin\EntityAmenityController as AdminEntityAmenityController;
 use App\Http\Controllers\Admin\EntityContactController as AdminEntityContactController;
 use App\Http\Controllers\Admin\EntityController as AdminEntityController;
@@ -27,6 +28,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/entities/{slug}', [EntityPageController::class, 'show'])->name('entity.show');
 
 Route::get('/dashboard', function () {
     return view('dashboard');

@@ -18,6 +18,11 @@ class Place extends Model
         return $this->hasMany(Place::class, 'parent_id');
     }
 
+    public function translations(): HasMany
+    {
+        return $this->hasMany(PlaceTranslation::class);
+    }
+
     public function entities(): HasMany
     {
         return $this->hasMany(Entity::class);
