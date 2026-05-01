@@ -645,27 +645,88 @@ DB-level CHECK constraint is not required in the first implementation pass due t
 
 ---
 
+## 2.18 `entity_price_signals`
+### Role
+Minimal price-signal layer for any entity.
+
+### Purpose
+Store structured price signals in a methodologically honest way.
+This is NOT a pricing engine.
+It does NOT claim exact current price truth, universal validity, or full booking/menu pricing coverage.
+
+It may represent:
+- an observed price signal (from research or third-party observation)
+- an owner-declared price signal
+- a categorical price signal only
+- a numeric price range signal
+
+### Approved fields
+- `id`
+- `entity_id` (FK to `entities.id`)
+- `signal_type`
+- `price_category` (nullable)
+- `currency` (nullable)
+- `amount_min` (nullable)
+- `amount_max` (nullable)
+- `observed_at` (nullable)
+- `created_at`
+- `updated_at`
+
+### Approved signal_type values
+- `observed`
+- `owner_declared`
+
+### Approved price_category values
+- `budget`
+- `midrange`
+- `premium`
+- `luxury`
+
+### Nullability rules
+- `price_category` — nullable: category-only signals without numeric data are allowed
+- `currency` — nullable: category-only signals carry no currency
+- `amount_min` — nullable: ceiling-only or category-only signals have no floor
+- `amount_max` — nullable: floor-only or category-only signals have no ceiling
+- `observed_at` — nullable: represents the time the signal was observed, declared, recorded, or captured; not required when the exact signal moment is unknown or irrelevant
+
+### Application-layer validation rules (not DB-level constraints)
+1. At least one of `price_category`, `amount_min`, or `amount_max` must be non-null — a fully null signal row carries no information
+2. If either `amount_min` or `amount_max` is present, `currency` should also be present
+
+### Notes
+- Universal — not domain-specific
+- Multiple honest signals over time for the same entity are explicitly allowed — no uniqueness constraint
+- `booking_url` is NOT stored here — use `entity_links` with type `booking`
+- Must NOT be coupled to `entity_sources` rows at the per-row level in Phase 1
+
+### Forbidden drift
+- `source_id`
+- `confidence_score`
+- `is_current`
+- `valid_from` / `valid_to`
+- `season_start` / `season_end`
+- `night_count` / `person_count`
+- `meal_plan` / `unit_type`
+- `pricing_note` / `price_text_raw`
+- `tax_included` / `fees_included`
+- `booking_url`
+- `provider_name` / `rank` / `is_primary`
+- any uniqueness model that blocks multiple honest signals over time
+- provider comparison logic
+- room-rate or menu pricing modeling
+- seasonality modeling
+- currency-conversion logic
+- historical pricing analytics
+- broad pricing abstraction layer
+
+---
+
 # 3. APPROVED LATER TABLES
 
 These are allowed later in Phase 1.5 or later Phase 1 expansion,
 but are not mandatory in the first base pass.
 
-## 3.1 `entity_price_signals`
-### Role
-Observed or owner-provided price range records.
 
-### Purpose
-Store price signals in a structured way without pretending they are always authoritative truth.
-
-### Notes
-- Price logic is sensitive and must remain methodologically honest.
-- Better to store observed/declared price signals than false certainty.
-
-### Forbidden drift
-- pretending prices are always exact and universally valid
-- embedding all price logic inside entities/details without provenance
-
----
 
 # 4. COLUMN DESIGN PRINCIPLES
 
@@ -792,6 +853,8 @@ The approved Phase 1 database direction is:
 - Laravel users as ownership/auth base
 
 - one lean directional relations layer (`entity_relations`)
+
+- one minimal price-signal layer (`entity_price_signals`)
 
 This is the approved foundation.
 

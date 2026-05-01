@@ -57,4 +57,9 @@ class Entity extends Model
     {
         return $this->hasMany(EntityRelation::class, 'to_entity_id');
     }
+
+    public function priceSignals(): HasMany
+    {
+        return $this->hasMany(EntityPriceSignal::class);
+    }
 }

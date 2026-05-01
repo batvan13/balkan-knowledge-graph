@@ -460,7 +460,6 @@ Constraint:
 
 Не са включени в тази фаза (все още извън scope):
 
-- `entity_price_signals`
 - normalized address layer
 - services-specific details
 - moderation/workflow layers
@@ -469,7 +468,6 @@ Constraint:
 - localized slugs
 - belongsToMany convenience relations
 - admin/UI logic
-- relation layer
 - claim/ownership layer
 - events domain
 - facets/classification layer
@@ -508,6 +506,7 @@ Constraint:
 - универсален links layer е имплементиран (`entity_links`)
 - универсален provenance layer е имплементиран (`entity_sources`)
 - минимален directional relations layer е имплементиран (`entity_relations`)
+- минимален price-signal layer е имплементиран (`entity_price_signals`)
 
 ---
 
@@ -549,10 +548,64 @@ Constraints:
 
 ---
 
+### 17. `entity_price_signals`
+Минимален price-signal layer за всеки entity.
+
+Одобрени колони:
+- `id`
+- `entity_id` (FK → `entities.id`)
+- `signal_type`
+- `price_category` (nullable)
+- `currency` (nullable)
+- `amount_min` (nullable)
+- `amount_max` (nullable)
+- `observed_at` (nullable)
+- timestamps
+
+Одобрени `signal_type` стойности:
+- `observed`
+- `owner_declared`
+
+Одобрени `price_category` стойности:
+- `budget`
+- `midrange`
+- `premium`
+- `luxury`
+
+Семантична позиция:
+- price signals layer — не е pricing engine
+- методологически честни сигнали, не authoritative price truth
+- category-only сигнали са разрешени
+- numeric-range сигнали са разрешени
+- частични но честни сигнали са разрешени
+
+Nullability правила:
+- `price_category`, `currency`, `amount_min`, `amount_max`, `observed_at` — всички nullable
+- `observed_at` покрива: момент на наблюдение, деклариране, или просто capture — не само буквален observation timestamp
+
+Application-layer правила (не DB-level constraints):
+- поне едно от `price_category`, `amount_min`, `amount_max` трябва да е non-null
+- ако `amount_min` или `amount_max` са present, `currency` също трябва да е present
+
+Constraints:
+- FK от `entity_id` → `entities.id` — restrictive (без cascade delete)
+- без unique constraint — multiple honest signals over time за един entity са позволени
+
+Бележки:
+- универсална таблица — не е domain-specific
+- без per-row coupling към `entity_sources`
+- `booking_url` НЕ е тук — ползва се `entity_links` с type `booking`
+- без `source_id`, `confidence_score`, `is_current`, `valid_from/to`, `season_start/end`, `night_count`, `meal_plan`, `pricing_note`, `provider_name`, `rank`, `is_primary`
+- без provider comparison, room-rate, menu pricing, seasonality, currency-conversion логика
+
+---
+
 ## Следваща посока
 
 Универсалният пакет (`entity_contacts`, `entity_links`, `entity_sources`) е напълно имплементиран.
 Минималният relations layer (`entity_relations`) е имплементиран.
+
+Универсалният пакет (`entity_contacts`, `entity_links`, `entity_sources`), relations layer (`entity_relations`) и price-signal layer (`entity_price_signals`) са напълно имплементирани.
 
 Следващите архитектурни решения трябва да продължат по същия модел:
 - table-by-table
