@@ -164,6 +164,92 @@
                 </div>
             </div>
 
+            {{-- Links section --}}
+            <div class="bg-white shadow-sm rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Links</h3>
+
+                @if($entity->links->isNotEmpty())
+                    <table class="w-full text-sm text-left mb-6">
+                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wide">
+                            <tr>
+                                <th class="px-3 py-2">Type</th>
+                                <th class="px-3 py-2">URL</th>
+                                <th class="px-3 py-2">Primary</th>
+                                <th class="px-3 py-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($entity->links->sortBy('type') as $link)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-2 font-mono text-gray-700">{{ $link->type }}</td>
+                                    <td class="px-3 py-2 text-gray-900 max-w-xs truncate">
+                                        <a href="{{ $link->url }}" target="_blank" rel="noopener noreferrer"
+                                           class="hover:underline text-blue-600">{{ $link->url }}</a>
+                                    </td>
+                                    <td class="px-3 py-2 text-gray-500">{{ $link->is_primary ? '✓' : '—' }}</td>
+                                    <td class="px-3 py-2 text-right">
+                                        <a href="{{ route('admin.entities.links.edit', [$entity, $link]) }}"
+                                           class="text-blue-600 hover:underline text-sm">Edit</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <p class="text-sm text-gray-400 mb-6">No links yet.</p>
+                @endif
+
+                <div class="border-t border-gray-100 pt-5">
+                    <h4 class="text-sm font-medium text-gray-600 mb-4">Add Link</h4>
+
+                    <form method="POST" action="{{ route('admin.entities.links.store', $entity) }}">
+                        @csrf
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">
+                                Type <span class="text-red-500">*</span>
+                            </label>
+                            <select name="type"
+                                    class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('type') border-red-500 @enderror">
+                                <option value="">— select —</option>
+                                @foreach(['website', 'facebook', 'instagram', 'tiktok', 'youtube', 'menu', 'booking'] as $t)
+                                    <option value="{{ $t }}" @selected(old('type') === $t)>{{ $t }}</option>
+                                @endforeach
+                            </select>
+                            @error('type')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">
+                                URL <span class="text-red-500">*</span>
+                            </label>
+                            <input type="url"
+                                   name="url"
+                                   value="{{ old('url') }}"
+                                   maxlength="2048"
+                                   placeholder="https://"
+                                   class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('url') border-red-500 @enderror">
+                            @error('url')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <input type="hidden" name="is_primary" value="0">
+                            <input type="checkbox" name="is_primary" value="1" id="link_is_primary"
+                                   @checked(old('is_primary'))
+                                   class="rounded border-gray-300 text-gray-800">
+                            <label for="link_is_primary" class="text-xs font-medium text-gray-600 select-none">Primary</label>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                    class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
+                                Add Link
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             {{-- Translations section --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Translations</h3>
