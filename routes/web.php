@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\EntityContactController as AdminEntityContactCont
 use App\Http\Controllers\Admin\EntityController as AdminEntityController;
 use App\Http\Controllers\Admin\EntityDetailController as AdminEntityDetailController;
 use App\Http\Controllers\Admin\EntityLinkController as AdminEntityLinkController;
+use App\Http\Controllers\Admin\EntitySourceController as AdminEntitySourceController;
 use App\Http\Controllers\Admin\EntityTranslationController as AdminEntityTranslationController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
@@ -38,6 +39,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/entities/create', [AdminEntityController::class, 'create'])->name('entities.create');
     Route::post('/entities', [AdminEntityController::class, 'store'])->name('entities.store');
     Route::get('/entities/{entity}/edit', [AdminEntityController::class, 'edit'])->name('entities.edit');
+
+    Route::post('/entities/{entity}/sources', [AdminEntitySourceController::class, 'store'])->name('entities.sources.store');
+    Route::get('/entities/{entity}/sources/{source}/edit', [AdminEntitySourceController::class, 'edit'])->name('entities.sources.edit');
+    Route::put('/entities/{entity}/sources/{source}', [AdminEntitySourceController::class, 'update'])->name('entities.sources.update');
 
     Route::post('/entities/{entity}/links', [AdminEntityLinkController::class, 'store'])->name('entities.links.store');
     Route::get('/entities/{entity}/links/{link}/edit', [AdminEntityLinkController::class, 'edit'])->name('entities.links.edit');

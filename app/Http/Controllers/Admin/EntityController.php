@@ -57,7 +57,7 @@ class EntityController extends Controller
 
     public function edit(Entity $entity)
     {
-        $entity->load(['entityType', 'place', 'user', 'translations', 'contacts', 'links']);
+        $entity->load(['entityType', 'place', 'user', 'translations', 'contacts', 'links', 'sources']);
 
         $family = $entity->detailFamily();
 

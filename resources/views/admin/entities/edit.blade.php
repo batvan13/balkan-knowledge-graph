@@ -250,6 +250,118 @@
                 </div>
             </div>
 
+            {{-- Sources section --}}
+            <div class="bg-white shadow-sm rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Sources</h3>
+
+                @if($entity->sources->isNotEmpty())
+                    <table class="w-full text-sm text-left mb-6">
+                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wide">
+                            <tr>
+                                <th class="px-3 py-2">Type</th>
+                                <th class="px-3 py-2">URL</th>
+                                <th class="px-3 py-2">Official</th>
+                                <th class="px-3 py-2">First Seen</th>
+                                <th class="px-3 py-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($entity->sources->sortBy('source_type') as $source)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-2 font-mono text-gray-700">{{ $source->source_type }}</td>
+                                    <td class="px-3 py-2 text-gray-500 max-w-xs truncate">
+                                        @if($source->source_url)
+                                            <a href="{{ $source->source_url }}" target="_blank" rel="noopener noreferrer"
+                                               class="hover:underline text-blue-600">{{ $source->source_url }}</a>
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
+                                    <td class="px-3 py-2 text-gray-500">{{ $source->is_official ? '✓' : '—' }}</td>
+                                    <td class="px-3 py-2 text-gray-400">{{ $source->first_seen_at?->format('Y-m-d') ?? '—' }}</td>
+                                    <td class="px-3 py-2 text-right">
+                                        <a href="{{ route('admin.entities.sources.edit', [$entity, $source]) }}"
+                                           class="text-blue-600 hover:underline text-sm">Edit</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <p class="text-sm text-gray-400 mb-6">No sources yet.</p>
+                @endif
+
+                <div class="border-t border-gray-100 pt-5">
+                    <h4 class="text-sm font-medium text-gray-600 mb-4">Add Source</h4>
+
+                    <form method="POST" action="{{ route('admin.entities.sources.store', $entity) }}">
+                        @csrf
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">
+                                    Source Type <span class="text-red-500">*</span>
+                                </label>
+                                <select name="source_type"
+                                        class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('source_type') border-red-500 @enderror">
+                                    <option value="">— select —</option>
+                                    @foreach(['official_website', 'social_profile', 'manual_entry', 'third_party_listing'] as $st)
+                                        <option value="{{ $st }}" @selected(old('source_type') === $st)>{{ $st }}</option>
+                                    @endforeach
+                                </select>
+                                @error('source_type')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Source URL</label>
+                                <input type="url"
+                                       name="source_url"
+                                       value="{{ old('source_url') }}"
+                                       maxlength="2048"
+                                       placeholder="https://"
+                                       class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('source_url') border-red-500 @enderror">
+                                @error('source_url')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">First Seen</label>
+                                <input type="datetime-local"
+                                       name="first_seen_at"
+                                       value="{{ old('first_seen_at') }}"
+                                       class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('first_seen_at') border-red-500 @enderror">
+                                @error('first_seen_at')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Last Seen</label>
+                                <input type="datetime-local"
+                                       name="last_seen_at"
+                                       value="{{ old('last_seen_at') }}"
+                                       class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('last_seen_at') border-red-500 @enderror">
+                                @error('last_seen_at')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <input type="hidden" name="is_official" value="0">
+                            <input type="checkbox" name="is_official" value="1" id="source_is_official"
+                                   @checked(old('is_official'))
+                                   class="rounded border-gray-300 text-gray-800">
+                            <label for="source_is_official" class="text-xs font-medium text-gray-600 select-none">Official</label>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                    class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
+                                Add Source
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             {{-- Translations section --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Translations</h3>
