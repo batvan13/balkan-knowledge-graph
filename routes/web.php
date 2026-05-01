@@ -29,6 +29,7 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Route::get('/entities', [EntityPageController::class, 'index'])->name('entity.index');
 Route::get('/entities/{slug}', [EntityPageController::class, 'show'])->name('entity.show');
 
 Route::get('/dashboard', function () {

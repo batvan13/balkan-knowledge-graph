@@ -9,6 +9,27 @@ use App\Models\FoodPlaceDetail;
 
 class EntityPageController extends Controller
 {
+    public function index()
+    {
+        $entities = Entity::where('status', 'published')
+            ->where('slug', 'not like', 'entity-%')
+            ->whereHas('translations', fn($q) => $q
+                ->where('locale', 'bg')
+                ->whereNotNull('name')
+                ->where('name', '!=', '')
+            )
+            ->with([
+                'entityType',
+                'translations'       => fn($q) => $q->where('locale', 'bg'),
+                'place.translations' => fn($q) => $q->where('locale', 'bg'),
+                'media'              => fn($q) => $q->where('is_cover', true)->whereNotNull('url'),
+            ])
+            ->latest()
+            ->paginate(24);
+
+        return view('public.entity.index', compact('entities'));
+    }
+
     public function show(string $slug)
     {
         $entity = Entity::where('slug', $slug)
