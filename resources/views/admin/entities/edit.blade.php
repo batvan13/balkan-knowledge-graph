@@ -362,6 +362,39 @@
                 </div>
             </div>
 
+            {{-- Amenities section --}}
+            <div class="bg-white shadow-sm rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Amenities</h3>
+
+                <form method="POST" action="{{ route('admin.entities.amenities.sync', $entity) }}">
+                    @csrf
+
+                    @if($allAmenities->isEmpty())
+                        <p class="text-sm text-gray-400 mb-4">No amenities defined in dictionary.</p>
+                    @else
+                        <div class="grid grid-cols-3 gap-x-6 gap-y-2 mb-5">
+                            @foreach($allAmenities as $amenity)
+                                <label class="flex items-center gap-2 text-sm text-gray-700 select-none cursor-pointer">
+                                    <input type="checkbox"
+                                           name="amenities[]"
+                                           value="{{ $amenity->id }}"
+                                           @checked(in_array($amenity->id, $selectedAmenityIds))
+                                           class="rounded border-gray-300 text-gray-800">
+                                    {{ $amenity->translations->first()?->name ?? $amenity->code }}
+                                </label>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="flex justify-end">
+                        <button type="submit"
+                                class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
+                            Save Amenities
+                        </button>
+                    </div>
+                </form>
+            </div>
+
             {{-- Translations section --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Translations</h3>

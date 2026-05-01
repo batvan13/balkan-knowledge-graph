@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\AccommodationDetail;
+use App\Models\Amenity;
 use App\Models\AttractionDetail;
 use App\Models\Entity;
 use App\Models\EntityType;
@@ -57,7 +58,7 @@ class EntityController extends Controller
 
     public function edit(Entity $entity)
     {
-        $entity->load(['entityType', 'place', 'user', 'translations', 'contacts', 'links', 'sources']);
+        $entity->load(['entityType', 'place', 'user', 'translations', 'contacts', 'links', 'sources', 'entityAmenities']);
 
         $family = $entity->detailFamily();
 
@@ -68,6 +69,9 @@ class EntityController extends Controller
             default         => null,
         };
 
-        return view('admin.entities.edit', compact('entity', 'family', 'detail'));
+        $allAmenities      = Amenity::with(['translations' => fn($q) => $q->where('locale', 'bg')])->orderBy('code')->get();
+        $selectedAmenityIds = $entity->entityAmenities->pluck('amenity_id')->toArray();
+
+        return view('admin.entities.edit', compact('entity', 'family', 'detail', 'allAmenities', 'selectedAmenityIds'));
     }
 }
