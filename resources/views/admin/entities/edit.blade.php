@@ -65,6 +65,21 @@
                 </dl>
             </div>
 
+            {{-- Details section --}}
+            <div class="bg-white shadow-sm rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Details</h3>
+
+                @if($family === 'accommodation')
+                    @include('admin.entities.details.accommodation', ['entity' => $entity, 'detail' => $detail])
+                @elseif($family === 'food_place')
+                    @include('admin.entities.details.food_place', ['entity' => $entity, 'detail' => $detail])
+                @elseif($family === 'attraction')
+                    @include('admin.entities.details.attraction', ['entity' => $entity, 'detail' => $detail])
+                @else
+                    <p class="text-sm text-gray-400">No structured details available for this entity type.</p>
+                @endif
+            </div>
+
             {{-- Translations section --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Translations</h3>

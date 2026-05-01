@@ -3,8 +3,11 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\AccommodationDetail;
+use App\Models\AttractionDetail;
 use App\Models\Entity;
 use App\Models\EntityType;
+use App\Models\FoodPlaceDetail;
 use App\Models\Place;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -56,6 +59,15 @@ class EntityController extends Controller
     {
         $entity->load(['entityType', 'place', 'user', 'translations']);
 
-        return view('admin.entities.edit', compact('entity'));
+        $family = $entity->detailFamily();
+
+        $detail = match ($family) {
+            'accommodation' => AccommodationDetail::where('entity_id', $entity->id)->first(),
+            'food_place'    => FoodPlaceDetail::where('entity_id', $entity->id)->first(),
+            'attraction'    => AttractionDetail::where('entity_id', $entity->id)->first(),
+            default         => null,
+        };
+
+        return view('admin.entities.edit', compact('entity', 'family', 'detail'));
     }
 }

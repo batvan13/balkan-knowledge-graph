@@ -67,4 +67,34 @@ class Entity extends Model
     {
         return $this->hasMany(EntityPriceSignal::class);
     }
+
+    public function detailFamily(): ?string
+    {
+        $code = $this->entityType?->code;
+
+        if (in_array($code, [
+            'hotel', 'guesthouse', 'apartment', 'house', 'villa',
+            'hostel', 'bungalow', 'camping', 'lodge',
+        ])) {
+            return 'accommodation';
+        }
+
+        if (in_array($code, [
+            'restaurant', 'tavern', 'bar', 'pub', 'cafe',
+            'bistro', 'fast_food', 'pastry_shop',
+        ])) {
+            return 'food_place';
+        }
+
+        if (in_array($code, [
+            'museum', 'gallery', 'monument', 'monastery', 'church', 'chapel',
+            'fortress', 'castle', 'palace', 'tomb', 'megalith', 'waterfall',
+            'cave', 'beach', 'park', 'reservoir', 'spring', 'rock_formation',
+            'heritage_tree', 'observatory', 'planetarium', 'zoo',
+        ])) {
+            return 'attraction';
+        }
+
+        return null;
+    }
 }
