@@ -482,6 +482,118 @@
                 </div>
             </div>
 
+            {{-- Relations section --}}
+            <div class="bg-white shadow-sm rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Relations</h3>
+
+                {{-- Outgoing --}}
+                @if($entity->outgoingRelations->isNotEmpty())
+                    <h4 class="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Outgoing</h4>
+                    <table class="w-full text-sm text-left mb-6">
+                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wide">
+                            <tr>
+                                <th class="px-3 py-2">Type</th>
+                                <th class="px-3 py-2">Target Entity</th>
+                                <th class="px-3 py-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($entity->outgoingRelations->sortBy('relation_type') as $rel)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-2 font-mono text-gray-700">{{ $rel->relation_type }}</td>
+                                    <td class="px-3 py-2 text-gray-700">
+                                        #{{ $rel->to_entity_id }}
+                                        <span class="text-gray-400 font-mono text-xs ml-1">[{{ $rel->toEntity?->entityType?->code ?? '?' }}]</span>
+                                        <span class="text-gray-500 ml-1">{{ $rel->toEntity?->translations->first()?->name ?? $rel->toEntity?->slug ?? '' }}</span>
+                                    </td>
+                                    <td class="px-3 py-2 text-right">
+                                        <a href="{{ route('admin.entities.relations.edit', [$entity, $rel]) }}"
+                                           class="text-blue-600 hover:underline text-sm">Edit</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <p class="text-sm text-gray-400 mb-6">No outgoing relations yet.</p>
+                @endif
+
+                {{-- Add outgoing relation form --}}
+                <div class="border-t border-gray-100 pt-5 mb-6">
+                    <h4 class="text-sm font-medium text-gray-600 mb-4">Add Relation</h4>
+
+                    <form method="POST" action="{{ route('admin.entities.relations.store', $entity) }}">
+                        @csrf
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">
+                                    Relation Type <span class="text-red-500">*</span>
+                                </label>
+                                <select name="relation_type"
+                                        class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('relation_type') border-red-500 @enderror">
+                                    <option value="">— select —</option>
+                                    @foreach(['located_in', 'near', 'part_of'] as $rt)
+                                        <option value="{{ $rt }}" @selected(old('relation_type') === $rt)>{{ $rt }}</option>
+                                    @endforeach
+                                </select>
+                                @error('relation_type')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">
+                                    Target Entity <span class="text-red-500">*</span>
+                                </label>
+                                <select name="to_entity_id"
+                                        class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('to_entity_id') border-red-500 @enderror">
+                                    <option value="">— select —</option>
+                                    @foreach($otherEntities as $e)
+                                        <option value="{{ $e->id }}" @selected((int) old('to_entity_id') === $e->id)>
+                                            #{{ $e->id }} [{{ $e->entityType?->code ?? '?' }}] {{ $e->translations->first()?->name ?? $e->slug }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('to_entity_id')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                    class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
+                                Add Relation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                {{-- Incoming (read-only) --}}
+                @if($entity->incomingRelations->isNotEmpty())
+                    <div class="border-t border-gray-100 pt-5">
+                        <h4 class="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-2">Incoming (read-only)</h4>
+                        <table class="w-full text-sm text-left">
+                            <thead class="bg-gray-50 border-b border-gray-200 text-gray-400 uppercase text-xs tracking-wide">
+                                <tr>
+                                    <th class="px-3 py-2">Type</th>
+                                    <th class="px-3 py-2">From Entity</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-100">
+                                @foreach($entity->incomingRelations->sortBy('relation_type') as $rel)
+                                    <tr>
+                                        <td class="px-3 py-2 font-mono text-gray-500">{{ $rel->relation_type }}</td>
+                                        <td class="px-3 py-2 text-gray-500">
+                                            #{{ $rel->from_entity_id }}
+                                            <span class="text-gray-400 font-mono text-xs ml-1">[{{ $rel->fromEntity?->entityType?->code ?? '?' }}]</span>
+                                            <span class="ml-1">{{ $rel->fromEntity?->translations->first()?->name ?? $rel->fromEntity?->slug ?? '' }}</span>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+
             {{-- Amenities section --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Amenities</h3>

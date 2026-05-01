@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\EntityController as AdminEntityController;
 use App\Http\Controllers\Admin\EntityDetailController as AdminEntityDetailController;
 use App\Http\Controllers\Admin\EntityLinkController as AdminEntityLinkController;
 use App\Http\Controllers\Admin\EntityMediaController as AdminEntityMediaController;
+use App\Http\Controllers\Admin\EntityRelationController as AdminEntityRelationController;
 use App\Http\Controllers\Admin\EntitySourceController as AdminEntitySourceController;
 use App\Http\Controllers\Admin\EntityTranslationController as AdminEntityTranslationController;
 use App\Http\Controllers\ProfileController;
@@ -55,6 +56,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::put('/entities/{entity}/contacts/{contact}', [AdminEntityContactController::class, 'update'])->name('entities.contacts.update');
 
     Route::post('/entities/{entity}/amenities', [AdminEntityAmenityController::class, 'sync'])->name('entities.amenities.sync');
+
+    Route::post('/entities/{entity}/relations', [AdminEntityRelationController::class, 'store'])->name('entities.relations.store');
+    Route::get('/entities/{entity}/relations/{relation}/edit', [AdminEntityRelationController::class, 'edit'])->name('entities.relations.edit');
+    Route::put('/entities/{entity}/relations/{relation}', [AdminEntityRelationController::class, 'update'])->name('entities.relations.update');
 
     Route::post('/entities/{entity}/media', [AdminEntityMediaController::class, 'store'])->name('entities.media.store');
     Route::get('/entities/{entity}/media/{media}/edit', [AdminEntityMediaController::class, 'edit'])->name('entities.media.edit');

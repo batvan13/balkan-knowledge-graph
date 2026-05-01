@@ -58,7 +58,14 @@ class EntityController extends Controller
 
     public function edit(Entity $entity)
     {
-        $entity->load(['entityType', 'place', 'user', 'translations', 'contacts', 'links', 'sources', 'media', 'entityAmenities']);
+        $entity->load([
+            'entityType', 'place', 'user', 'translations',
+            'contacts', 'links', 'sources', 'media', 'entityAmenities',
+            'outgoingRelations.toEntity.entityType',
+            'outgoingRelations.toEntity.translations',
+            'incomingRelations.fromEntity.entityType',
+            'incomingRelations.fromEntity.translations',
+        ]);
 
         $family = $entity->detailFamily();
 
@@ -72,6 +79,15 @@ class EntityController extends Controller
         $allAmenities      = Amenity::with(['translations' => fn($q) => $q->where('locale', 'bg')])->orderBy('code')->get();
         $selectedAmenityIds = $entity->entityAmenities->pluck('amenity_id')->toArray();
 
-        return view('admin.entities.edit', compact('entity', 'family', 'detail', 'allAmenities', 'selectedAmenityIds'));
+        $otherEntities = Entity::with(['entityType', 'translations'])
+            ->where('id', '!=', $entity->id)
+            ->orderBy('id')
+            ->get();
+
+        return view('admin.entities.edit', compact(
+            'entity', 'family', 'detail',
+            'allAmenities', 'selectedAmenityIds',
+            'otherEntities'
+        ));
     }
 }
