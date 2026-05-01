@@ -362,6 +362,126 @@
                 </div>
             </div>
 
+            {{-- Media section --}}
+            <div class="bg-white shadow-sm rounded-lg p-6">
+                <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Media</h3>
+
+                @if($entity->media->isNotEmpty())
+                    <table class="w-full text-sm text-left mb-6">
+                        <thead class="bg-gray-50 border-b border-gray-200 text-gray-500 uppercase text-xs tracking-wide">
+                            <tr>
+                                <th class="px-3 py-2">Type</th>
+                                <th class="px-3 py-2">Path</th>
+                                <th class="px-3 py-2">URL</th>
+                                <th class="px-3 py-2">Cover</th>
+                                <th class="px-3 py-2">Sort</th>
+                                <th class="px-3 py-2"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            @foreach($entity->media->sortBy('sort_order') as $mediaRow)
+                                <tr class="hover:bg-gray-50">
+                                    <td class="px-3 py-2 font-mono text-gray-700">{{ $mediaRow->type }}</td>
+                                    <td class="px-3 py-2 text-gray-500 max-w-xs truncate font-mono text-xs">
+                                        {{ $mediaRow->path ?? '—' }}
+                                    </td>
+                                    <td class="px-3 py-2 text-gray-500 max-w-xs truncate">
+                                        @if($mediaRow->url)
+                                            <a href="{{ $mediaRow->url }}" target="_blank" rel="noopener noreferrer"
+                                               class="hover:underline text-blue-600">{{ $mediaRow->url }}</a>
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
+                                    <td class="px-3 py-2 text-gray-500">{{ $mediaRow->is_cover ? '✓' : '—' }}</td>
+                                    <td class="px-3 py-2 text-gray-400">{{ $mediaRow->sort_order }}</td>
+                                    <td class="px-3 py-2 text-right">
+                                        <a href="{{ route('admin.entities.media.edit', [$entity, $mediaRow]) }}"
+                                           class="text-blue-600 hover:underline text-sm">Edit</a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @else
+                    <p class="text-sm text-gray-400 mb-6">No media yet.</p>
+                @endif
+
+                <div class="border-t border-gray-100 pt-5">
+                    <h4 class="text-sm font-medium text-gray-600 mb-4">Add Media</h4>
+
+                    <form method="POST" action="{{ route('admin.entities.media.store', $entity) }}">
+                        @csrf
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">
+                                    Type <span class="text-red-500">*</span>
+                                </label>
+                                <select name="type"
+                                        class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('type') border-red-500 @enderror">
+                                    <option value="">— select —</option>
+                                    @foreach(['image', 'video'] as $mt)
+                                        <option value="{{ $mt }}" @selected(old('type') === $mt)>{{ $mt }}</option>
+                                    @endforeach
+                                </select>
+                                @error('type')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">Sort Order</label>
+                                <input type="number"
+                                       name="sort_order"
+                                       value="{{ old('sort_order', 0) }}"
+                                       min="0"
+                                       max="65535"
+                                       class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('sort_order') border-red-500 @enderror">
+                                @error('sort_order')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">Path</label>
+                            <input type="text"
+                                   name="path"
+                                   value="{{ old('path') }}"
+                                   maxlength="1000"
+                                   placeholder="storage/media/..."
+                                   class="w-full border-gray-300 rounded-md shadow-sm text-sm font-mono @error('path') border-red-500 @enderror">
+                            @error('path')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <div class="mb-4">
+                            <label class="block text-xs font-medium text-gray-600 mb-1">URL</label>
+                            <input type="url"
+                                   name="url"
+                                   value="{{ old('url') }}"
+                                   maxlength="2048"
+                                   placeholder="https://"
+                                   class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('url') border-red-500 @enderror">
+                            @error('url')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                        </div>
+
+                        <p class="text-xs text-gray-400 mb-4">At least one of Path or URL is required.</p>
+
+                        <div class="flex items-center gap-2 mb-4">
+                            <input type="hidden" name="is_cover" value="0">
+                            <input type="checkbox" name="is_cover" value="1" id="media_is_cover"
+                                   @checked(old('is_cover'))
+                                   class="rounded border-gray-300 text-gray-800">
+                            <label for="media_is_cover" class="text-xs font-medium text-gray-600 select-none">Cover</label>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                    class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
+                                Add Media
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             {{-- Amenities section --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Amenities</h3>
