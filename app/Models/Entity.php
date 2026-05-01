@@ -68,10 +68,8 @@ class Entity extends Model
         return $this->hasMany(EntityPriceSignal::class);
     }
 
-    public function detailFamily(): ?string
+    public static function detailFamilyForCode(?string $code): ?string
     {
-        $code = $this->entityType?->code;
-
         if (in_array($code, [
             'hotel', 'guesthouse', 'apartment', 'house', 'villa',
             'hostel', 'bungalow', 'camping', 'lodge',
@@ -96,5 +94,10 @@ class Entity extends Model
         }
 
         return null;
+    }
+
+    public function detailFamily(): ?string
+    {
+        return static::detailFamilyForCode($this->entityType?->code);
     }
 }

@@ -85,10 +85,52 @@ class EntityController extends Controller
             ->orderBy('id')
             ->get();
 
+        $entityTypes = EntityType::orderBy('code')->get();
+        $places      = Place::orderBy('slug')->get();
+
         return view('admin.entities.edit', compact(
             'entity', 'family', 'detail',
             'allAmenities', 'selectedAmenityIds',
-            'otherEntities'
+            'otherEntities',
+            'entityTypes', 'places'
         ));
+    }
+
+    public function updateCore(Request $request, Entity $entity)
+    {
+        $validated = $request->validate([
+            'entity_type_id' => ['required', 'integer', 'exists:entity_types,id'],
+            'place_id'       => ['required', 'integer', 'exists:places,id'],
+            'status'         => ['required', 'in:draft,published,archived'],
+        ]);
+
+        $entity->loadMissing('entityType');
+        $currentFamily = $entity->detailFamily();
+
+        $newType   = EntityType::find($validated['entity_type_id']);
+        $newFamily = Entity::detailFamilyForCode($newType->code);
+
+        if ($currentFamily !== null && $currentFamily !== $newFamily) {
+            $detailExists = match ($currentFamily) {
+                'accommodation' => AccommodationDetail::where('entity_id', $entity->id)->exists(),
+                'food_place'    => FoodPlaceDetail::where('entity_id', $entity->id)->exists(),
+                'attraction'    => AttractionDetail::where('entity_id', $entity->id)->exists(),
+                default         => false,
+            };
+
+            if ($detailExists) {
+                return back()->withInput()->withErrors([
+                    'entity_type_id' => 'Cannot change entity type across families: a ' . $currentFamily . ' detail record exists. Remove the detail data first.',
+                ]);
+            }
+        }
+
+        $entity->entity_type_id = $validated['entity_type_id'];
+        $entity->place_id       = $validated['place_id'];
+        $entity->status         = $validated['status'];
+        $entity->save();
+
+        return redirect()->route('admin.entities.edit', $entity)
+            ->with('success', 'Core entity data updated.');
     }
 }

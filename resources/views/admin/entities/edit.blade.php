@@ -21,30 +21,11 @@
             {{-- Core entity info --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Core</h3>
-                <dl class="grid grid-cols-2 gap-x-8 gap-y-4 text-sm">
+
+                <dl class="grid grid-cols-2 gap-x-8 gap-y-3 text-sm mb-6">
                     <div>
                         <dt class="font-medium text-gray-500">ID</dt>
                         <dd class="text-gray-900 mt-0.5">{{ $entity->id }}</dd>
-                    </div>
-                    <div>
-                        <dt class="font-medium text-gray-500">Status</dt>
-                        <dd class="mt-0.5">
-                            <span class="px-2 py-0.5 rounded text-xs font-medium
-                                @if($entity->status === 'published') bg-green-100 text-green-800
-                                @elseif($entity->status === 'archived') bg-gray-200 text-gray-600
-                                @else bg-yellow-100 text-yellow-800
-                                @endif">
-                                {{ $entity->status }}
-                            </span>
-                        </dd>
-                    </div>
-                    <div>
-                        <dt class="font-medium text-gray-500">Type</dt>
-                        <dd class="font-mono text-gray-900 mt-0.5">{{ $entity->entityType?->code ?? '—' }}</dd>
-                    </div>
-                    <div>
-                        <dt class="font-medium text-gray-500">Place</dt>
-                        <dd class="text-gray-900 mt-0.5">{{ $entity->place?->slug ?? '—' }}</dd>
                     </div>
                     <div>
                         <dt class="font-medium text-gray-500">Slug</dt>
@@ -63,6 +44,65 @@
                         <dd class="text-gray-400 mt-0.5">{{ $entity->updated_at->format('Y-m-d H:i') }}</dd>
                     </div>
                 </dl>
+
+                <div class="border-t border-gray-100 pt-5">
+                    <form method="POST" action="{{ route('admin.entities.updateCore', $entity) }}">
+                        @csrf
+                        @method('PUT')
+
+                        <div class="grid grid-cols-3 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">
+                                    Status <span class="text-red-500">*</span>
+                                </label>
+                                <select name="status"
+                                        class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('status') border-red-500 @enderror">
+                                    @foreach(['draft', 'published', 'archived'] as $s)
+                                        <option value="{{ $s }}" @selected(old('status', $entity->status) === $s)>{{ $s }}</option>
+                                    @endforeach
+                                </select>
+                                @error('status')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">
+                                    Type <span class="text-red-500">*</span>
+                                </label>
+                                <select name="entity_type_id"
+                                        class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('entity_type_id') border-red-500 @enderror">
+                                    @foreach($entityTypes as $et)
+                                        <option value="{{ $et->id }}" @selected((int) old('entity_type_id', $entity->entity_type_id) === $et->id)>
+                                            {{ $et->code }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('entity_type_id')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+
+                            <div>
+                                <label class="block text-xs font-medium text-gray-600 mb-1">
+                                    Place <span class="text-red-500">*</span>
+                                </label>
+                                <select name="place_id"
+                                        class="w-full border-gray-300 rounded-md shadow-sm text-sm @error('place_id') border-red-500 @enderror">
+                                    @foreach($places as $pl)
+                                        <option value="{{ $pl->id }}" @selected((int) old('place_id', $entity->place_id) === $pl->id)>
+                                            {{ $pl->slug }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('place_id')<p class="text-red-600 text-xs mt-1">{{ $message }}</p>@enderror
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit"
+                                    class="px-4 py-2 bg-gray-800 text-white text-sm rounded hover:bg-gray-700">
+                                Update Core
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
 
             {{-- Details section --}}

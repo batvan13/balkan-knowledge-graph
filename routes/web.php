@@ -43,6 +43,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/entities/create', [AdminEntityController::class, 'create'])->name('entities.create');
     Route::post('/entities', [AdminEntityController::class, 'store'])->name('entities.store');
     Route::get('/entities/{entity}/edit', [AdminEntityController::class, 'edit'])->name('entities.edit');
+    Route::put('/entities/{entity}/core', [AdminEntityController::class, 'updateCore'])->name('entities.updateCore');
 
     Route::post('/entities/{entity}/sources', [AdminEntitySourceController::class, 'store'])->name('entities.sources.store');
     Route::get('/entities/{entity}/sources/{source}/edit', [AdminEntitySourceController::class, 'edit'])->name('entities.sources.edit');
