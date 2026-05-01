@@ -18,6 +18,12 @@
                 </div>
             @endif
 
+            @if(session('error'))
+                <div class="px-4 py-3 bg-red-50 border border-red-200 text-red-800 text-sm rounded">
+                    {{ session('error') }}
+                </div>
+            @endif
+
             {{-- Core entity info --}}
             <div class="bg-white shadow-sm rounded-lg p-6">
                 <h3 class="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-4">Core</h3>
@@ -30,6 +36,23 @@
                     <div>
                         <dt class="font-medium text-gray-500">Slug</dt>
                         <dd class="font-mono text-xs text-gray-400 mt-0.5">{{ $entity->slug }}</dd>
+                        @php
+                            $bgTrans  = $entity->translations->firstWhere('locale', 'bg');
+                            $hasBgName = $bgTrans && trim($bgTrans->name ?? '') !== '';
+                        @endphp
+                        @if(str_starts_with($entity->slug, 'entity-') && $hasBgName)
+                            <form method="POST"
+                                  action="{{ route('admin.entities.generateSlug', $entity) }}"
+                                  class="mt-2">
+                                @csrf
+                                <button type="submit"
+                                        class="px-3 py-1 bg-amber-600 text-white text-xs rounded hover:bg-amber-700">
+                                    Generate Slug
+                                </button>
+                            </form>
+                        @elseif(str_starts_with($entity->slug, 'entity-'))
+                            <p class="text-xs text-gray-400 mt-1">Add a BG translation to enable slug generation.</p>
+                        @endif
                     </div>
                     <div>
                         <dt class="font-medium text-gray-500">Owner</dt>

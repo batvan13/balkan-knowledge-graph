@@ -96,6 +96,38 @@ class EntityController extends Controller
         ));
     }
 
+    public function generateSlug(Entity $entity)
+    {
+        if (!str_starts_with($entity->slug, 'entity-')) {
+            return redirect()->route('admin.entities.edit', $entity)
+                ->with('error', 'Slug is already set and cannot be regenerated.');
+        }
+
+        $bgTranslation = $entity->translations()
+            ->where('locale', 'bg')
+            ->whereNotNull('name')
+            ->where('name', '!=', '')
+            ->first();
+
+        if (!$bgTranslation) {
+            return redirect()->route('admin.entities.edit', $entity)
+                ->with('error', 'No valid Bulgarian translation found. Add a BG translation with a name first.');
+        }
+
+        $newSlug = Entity::generateSlugFromBgName($bgTranslation->name, $entity->id);
+
+        if ($newSlug === '') {
+            return redirect()->route('admin.entities.edit', $entity)
+                ->with('error', 'Could not generate a usable slug from the Bulgarian name.');
+        }
+
+        $entity->slug = $newSlug;
+        $entity->save();
+
+        return redirect()->route('admin.entities.edit', $entity)
+            ->with('success', 'Slug generated: ' . $newSlug);
+    }
+
     public function updateCore(Request $request, Entity $entity)
     {
         $validated = $request->validate([
