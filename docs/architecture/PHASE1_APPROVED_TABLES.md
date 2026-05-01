@@ -487,12 +487,7 @@ Store structured contact information per entity, independent of domain.
 
 ---
 
-# 2A. APPROVED NEXT UNIVERSAL PACKAGE
-
-These tables are **approved** as the next Phase 1 implementation package.
-They are **not yet implemented**.
-
-## 2A.1 `entity_links`
+## 2.15 `entity_links`
 ### Role
 Universal external URLs table for any entity.
 
@@ -522,6 +517,7 @@ Store structured external presence links per entity, independent of domain.
 - `is_primary` identifies the canonical link per type.
 - No `sort_order` — not needed at Phase 1.
 - `map` is excluded — coordinates already exist on `entities` (`lat`/`lng`).
+- FK is restrictive by default (no cascade delete).
 
 ### Forbidden drift
 - SEO metadata fields
@@ -534,7 +530,12 @@ Store structured external presence links per entity, independent of domain.
 
 ---
 
-## 2A.2 `entity_sources`
+# 2A. APPROVED NEXT UNIVERSAL PACKAGE
+
+These tables are **approved** as the next Phase 1 implementation package.
+They are **not yet implemented**.
+
+## 2A.1 `entity_sources`
 ### Role
 Universal provenance / source-of-truth layer for any entity.
 
@@ -717,10 +718,10 @@ The approved Phase 1 database direction is:
 - one unified amenities system
 - one unified media system
 - one universal contact points table (`entity_contacts`)
+- one universal external links table (`entity_links`)
 - Laravel users as ownership/auth base
 
 **Approved next (not yet implemented):**
-- one universal external links table (`entity_links`)
 - one universal source provenance table (`entity_sources`)
 
 This is the approved foundation.
