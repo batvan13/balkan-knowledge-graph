@@ -530,12 +530,7 @@ Store structured external presence links per entity, independent of domain.
 
 ---
 
-# 2A. APPROVED NEXT UNIVERSAL PACKAGE
-
-These tables are **approved** as the next Phase 1 implementation package.
-They are **not yet implemented**.
-
-## 2A.1 `entity_sources`
+## 2.16 `entity_sources`
 ### Role
 Universal provenance / source-of-truth layer for any entity.
 
@@ -719,10 +714,8 @@ The approved Phase 1 database direction is:
 - one unified media system
 - one universal contact points table (`entity_contacts`)
 - one universal external links table (`entity_links`)
-- Laravel users as ownership/auth base
-
-**Approved next (not yet implemented):**
 - one universal source provenance table (`entity_sources`)
+- Laravel users as ownership/auth base
 
 This is the approved foundation.
 

@@ -413,12 +413,7 @@ Constraint:
 
 ---
 
-## Одобрен следващ пакет (не е имплементиран още)
-
-Следните таблици са одобрени като следващ Phase 1 пакет.
-Те **не са имплементирани** към момента на този checkpoint.
-
-### Next-1. `entity_sources`
+### 15. `entity_sources`
 Универсален provenance / source-of-truth слой за всеки entity.
 
 Одобрени колони:
@@ -439,6 +434,10 @@ Constraint:
 
 Бележки:
 - универсална таблица — не е domain-specific
+- `source_url` е nullable — `manual_entry` редовете нямат URL
+- `is_official` е boolean с default `false` — неизвестно = не потвърдено официално
+- `first_seen_at` и `last_seen_at` са nullable timestamps — provenance данните са частично известни при създаване
+- FK поведение: restrictive (без cascade delete)
 - без confidence score, crawl state, parser version, raw payload, per-field provenance
 - не се слива с `entity_links`
 
@@ -507,17 +506,15 @@ Constraint:
 - type-specific extension pattern е доказан с три имплементирани detail tables
 - универсален contact layer е имплементиран (`entity_contacts`)
 - универсален links layer е имплементиран (`entity_links`)
+- универсален provenance layer е имплементиран (`entity_sources`)
 
 ---
 
 ## Следваща посока
 
-Одобреният следващ имплементационен пакет е:
-- `entity_sources`
+Универсалният пакет (`entity_contacts`, `entity_links`, `entity_sources`) е напълно имплементиран.
 
-Вижте секция "Одобрен следващ пакет" по-горе за точните колони и одобрени стойности.
-
-След имплементацията на този пакет, следващите архитектурни решения трябва да продължат по същия модел:
+Следващите архитектурни решения трябва да продължат по същия модел:
 - table-by-table
 - без overengineering
 - без premature abstractions

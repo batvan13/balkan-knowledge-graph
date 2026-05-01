@@ -42,4 +42,9 @@ class Entity extends Model
     {
         return $this->hasMany(EntityLink::class);
     }
+
+    public function sources(): HasMany
+    {
+        return $this->hasMany(EntitySource::class);
+    }
 }
