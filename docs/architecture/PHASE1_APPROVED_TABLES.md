@@ -571,6 +571,80 @@ Store where entity data came from, supporting methodological honesty about data 
 
 ---
 
+## 2.17 `entity_relations`
+### Role
+Minimal directional entity-to-entity relation layer.
+
+### Purpose
+Express structural and physical proximity relations between catalog objects.
+This is NOT a generic graph engine.
+It is a lean, tightly scoped, directional relation table.
+
+### Approved fields
+- `id`
+- `from_entity_id` (FK to `entities.id`)
+- `to_entity_id` (FK to `entities.id`)
+- `relation_type`
+- `created_at`
+- `updated_at`
+
+### Approved relation_type values
+- `located_in`
+- `near`
+- `part_of`
+
+### Semantic rules per relation_type
+- `located_in` — entity-level containment or contextual association between two entities (e.g. a restaurant located inside a hotel complex). NOT a replacement for `place_id`.
+- `part_of` — structural belonging: one entity is a component or sub-unit of another (e.g. a chapel that is part of a monastery complex).
+- `near` — real physical proximity between two catalog entities. Must NOT be used for thematic, marketing, discovery-only, or vague convenience association.
+
+### Directionality
+The relation model is directional.
+- `from_entity_id` → source of the relation
+- `to_entity_id` → target of the relation
+
+Explicitly rejected column naming:
+- `entity_a_id` / `entity_b_id` — undirected pair model is not approved
+
+A directed relation (`A → near → B`) and its reverse (`B → near → A`) are distinct rows if both are intended.
+
+### Approved constraints
+- FK from `from_entity_id` → `entities.id` — restrictive (no cascade delete)
+- FK from `to_entity_id` → `entities.id` — restrictive (no cascade delete)
+- Composite UNIQUE on (`from_entity_id`, `to_entity_id`, `relation_type`) — prevents duplicate directed typed relations between the same pair
+
+### No-self-relation rule
+An entity must not relate to itself (`from_entity_id ≠ to_entity_id`).
+This is a hard architectural rule.
+In the first implementation pass, enforcement is at the application layer only.
+DB-level CHECK constraint is not required in the first implementation pass due to cross-driver portability concerns.
+
+### Forbidden drift
+- `is_primary`
+- `sort_order`
+- `confidence_score`
+- `weight`
+- `distance_meters`
+- `valid_from` / `valid_to`
+- `source_id`
+- `note` / `description`
+- `status` / `approved_by` / `created_by`
+- `is_bidirectional`
+- reverse auto-generation logic
+- inferred or computed relation engine
+- distance-calculated automatic relations
+- relation moderation workflow
+- relation types beyond `located_in`, `near`, `part_of`
+- relation-to-place tables
+- relation-to-media tables
+- relation-to-amenity tables
+- claim relations
+- event relations
+- taxonomy hierarchy relations
+- broad graph abstraction layer
+
+---
+
 # 3. APPROVED LATER TABLES
 
 These are allowed later in Phase 1.5 or later Phase 1 expansion,
@@ -716,6 +790,8 @@ The approved Phase 1 database direction is:
 - one universal external links table (`entity_links`)
 - one universal source provenance table (`entity_sources`)
 - Laravel users as ownership/auth base
+
+- one lean directional relations layer (`entity_relations`)
 
 This is the approved foundation.
 

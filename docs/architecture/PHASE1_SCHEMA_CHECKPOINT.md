@@ -507,12 +507,52 @@ Constraint:
 - универсален contact layer е имплементиран (`entity_contacts`)
 - универсален links layer е имплементиран (`entity_links`)
 - универсален provenance layer е имплементиран (`entity_sources`)
+- минимален directional relations layer е имплементиран (`entity_relations`)
+
+---
+
+### 16. `entity_relations`
+Минимален директен entity-to-entity relation layer.
+
+Одобрени колони:
+- `id`
+- `from_entity_id` (FK → `entities.id`)
+- `to_entity_id` (FK → `entities.id`)
+- `relation_type`
+- timestamps
+
+Одобрени `relation_type` стойности:
+- `located_in`
+- `near`
+- `part_of`
+
+Семантични правила:
+- `located_in` — entity-level containment между два entity обекта; НЕ е заместник на `place_id`
+- `part_of` — структурна принадлежност (напр. параклис като част от монастир)
+- `near` — само реална физическа близост между два entity обекта; НЕ за тематични, маркетингови или vague convenience връзки
+
+Directionality:
+- моделът е директен: `from_entity_id` → `to_entity_id`
+- `entity_a_id` / `entity_b_id` naming е отхвърлен
+
+Constraints:
+- FK от `from_entity_id` → `entities.id` — restrictive (без cascade delete)
+- FK от `to_entity_id` → `entities.id` — restrictive (без cascade delete)
+- Composite UNIQUE на (`from_entity_id`, `to_entity_id`, `relation_type`)
+- No-self-relation е архитектурно задължително правило — прилагано на application layer
+
+Бележки:
+- не е generic graph engine
+- само entity-to-entity директни relations
+- без `confidence_score`, `weight`, `distance_meters`, `valid_from/to`, `source_id`, `note`, `status`, moderation fields
+- без relation type expansion извън одобрения V1 set
 
 ---
 
 ## Следваща посока
 
 Универсалният пакет (`entity_contacts`, `entity_links`, `entity_sources`) е напълно имплементиран.
+Минималният relations layer (`entity_relations`) е имплементиран.
 
 Следващите архитектурни решения трябва да продължат по същия модел:
 - table-by-table

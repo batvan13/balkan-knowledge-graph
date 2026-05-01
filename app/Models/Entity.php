@@ -47,4 +47,14 @@ class Entity extends Model
     {
         return $this->hasMany(EntitySource::class);
     }
+
+    public function outgoingRelations(): HasMany
+    {
+        return $this->hasMany(EntityRelation::class, 'from_entity_id');
+    }
+
+    public function incomingRelations(): HasMany
+    {
+        return $this->hasMany(EntityRelation::class, 'to_entity_id');
+    }
 }
