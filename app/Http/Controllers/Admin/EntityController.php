@@ -61,6 +61,7 @@ class EntityController extends Controller
         $entity->load([
             'entityType', 'place', 'user', 'translations',
             'contacts', 'links', 'sources', 'media', 'entityAmenities',
+            'priceSignals',
             'outgoingRelations.toEntity.entityType',
             'outgoingRelations.toEntity.translations',
             'incomingRelations.fromEntity.entityType',

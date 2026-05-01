@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\EntityController as AdminEntityController;
 use App\Http\Controllers\Admin\EntityDetailController as AdminEntityDetailController;
 use App\Http\Controllers\Admin\EntityLinkController as AdminEntityLinkController;
 use App\Http\Controllers\Admin\EntityMediaController as AdminEntityMediaController;
+use App\Http\Controllers\Admin\EntityPriceSignalController as AdminEntityPriceSignalController;
 use App\Http\Controllers\Admin\EntityRelationController as AdminEntityRelationController;
 use App\Http\Controllers\Admin\EntitySourceController as AdminEntitySourceController;
 use App\Http\Controllers\Admin\EntityTranslationController as AdminEntityTranslationController;
@@ -64,6 +65,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::post('/entities/{entity}/media', [AdminEntityMediaController::class, 'store'])->name('entities.media.store');
     Route::get('/entities/{entity}/media/{media}/edit', [AdminEntityMediaController::class, 'edit'])->name('entities.media.edit');
     Route::put('/entities/{entity}/media/{media}', [AdminEntityMediaController::class, 'update'])->name('entities.media.update');
+
+    Route::post('/entities/{entity}/price-signals', [AdminEntityPriceSignalController::class, 'store'])->name('entities.price-signals.store');
+    Route::get('/entities/{entity}/price-signals/{priceSignal}/edit', [AdminEntityPriceSignalController::class, 'edit'])->name('entities.price-signals.edit');
+    Route::put('/entities/{entity}/price-signals/{priceSignal}', [AdminEntityPriceSignalController::class, 'update'])->name('entities.price-signals.update');
 
     Route::post('/entities/{entity}/details', [AdminEntityDetailController::class, 'upsert'])->name('entities.details.upsert');
 
